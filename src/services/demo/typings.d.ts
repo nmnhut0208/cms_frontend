@@ -65,4 +65,40 @@ declare namespace API {
   }
 
   type definitions_0 = null;
+
+  type ServiceTypeEnum = 'txt2img' | 'img2img';
+
+  type Service = {
+    id?: number;
+    name: string;
+    code: string;
+    description?: string;
+    type: ServiceTypeEnum;
+  };
+
+  interface ServiceVO {
+    name: string;
+    code: string;
+    description?: string;
+    type: ServiceTypeEnum;
+  }
+
+  interface PageInfo_Service_ {
+    current?: number;
+    pageSize?: number;
+    total?: number;
+    list?: Array<Service>;
+  }
+
+  interface Result_PageInfo_Service__ {
+    success?: boolean;
+    errorMessage?: string;
+    data?: PageInfo_Service_;
+  }
+
+  interface Result_Service_ {
+    success?: boolean;
+    errorMessage?: string;
+    data?: Service;
+  }
 }

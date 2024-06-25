@@ -12,17 +12,17 @@ import React, { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
 
-const { addUser, queryUserList, deleteUser, modifyUser } =
-  services.UserController;
+const { addService, queryServiceList, modifyService, deleteService } =
+  services.ServiceController;
 
 /**
  * Adding Nodes
  * @param fields
  */
-const handleAdd = async (fields: API.UserInfo) => {
+const handleAdd = async (fields: API.Service) => {
   const hide = message.loading('Adding');
   try {
-    await addUser({ ...fields });
+    await addService({ ...fields });
     hide();
     message.success('Added successfully');
     return true;
@@ -40,14 +40,15 @@ const handleAdd = async (fields: API.UserInfo) => {
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('Configuring');
   try {
-    await modifyUser(
+    await modifyService(
       {
-        userId: fields.id || '',
+        serviceId: fields.id,
       },
       {
         name: fields.name || '',
-        nickName: fields.nickName || '',
-        email: fields.email || '',
+        code: fields.code || '',
+        description: fields.description || '',
+        type: fields.type as API.ServiceTypeEnum,
       },
     );
     hide();
@@ -65,12 +66,12 @@ const handleUpdate = async (fields: FormValueType) => {
  *  Deleting a Node
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.UserInfo[]) => {
+const handleRemove = async (selectedRows: API.Service[]) => {
   const hide = message.loading('Deleting');
   if (!selectedRows) return true;
   try {
-    await deleteUser({
-      userId: selectedRows.find((row) => row.id)?.id || '',
+    await deleteService({
+      serviceId: selectedRows.find((row) => row.id)?.id,
     });
     hide();
     message.success('Deleted successfully, will be refreshed soon');
@@ -88,9 +89,9 @@ const TableList: React.FC<unknown> = () => {
     useState<boolean>(false);
   const [stepFormValues, setStepFormValues] = useState({});
   const actionRef = useRef<ActionType>();
-  const [row, setRow] = useState<API.UserInfo>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
-  const columns: ProDescriptionsItemProps<API.UserInfo>[] = [
+  const [row, setRow] = useState<API.Service>();
+  const [selectedRowsState, setSelectedRows] = useState<API.Service[]>([]);
+  const columns: ProDescriptionsItemProps<API.Service>[] = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -106,17 +107,23 @@ const TableList: React.FC<unknown> = () => {
       },
     },
     {
-      title: 'Nickname',
-      dataIndex: 'nickName',
+      title: 'Code',
+      dataIndex: 'code',
       valueType: 'text',
     },
     {
-      title: 'Gender',
-      dataIndex: 'gender',
-      hideInForm: true,
+      title: 'Description',
+      dataIndex: 'description',
+      valueType: 'text',
+      hideInSearch: true,
+      hideInTable: true,
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
       valueEnum: {
-        0: { text: 'Male', status: 'MALE' },
-        1: { text: 'Female', status: 'FEMALE' },
+        0: { text: 'Txt2Img', status: 'txt2img' },
+        1: { text: 'Img2Img', status: 'img2img' },
       },
     },
     {
@@ -134,7 +141,14 @@ const TableList: React.FC<unknown> = () => {
             Configure
           </a>
           <Divider type="vertical" />
-          <a href="">Subscribe to Alerts</a>
+          <a
+            onClick={() => {
+              handleRemove([record]);
+              actionRef.current?.reloadAndRest?.();
+            }}
+          >
+            Delete
+          </a>
         </>
       ),
     },
@@ -143,11 +157,11 @@ const TableList: React.FC<unknown> = () => {
   return (
     <PageContainer
       header={{
-        title: 'CRUD example',
+        title: 'Services',
       }}
     >
-      <ProTable<API.UserInfo>
-        headerTitle="Enquiry Form"
+      <ProTable<API.Service>
+        headerTitle="Service List"
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -163,7 +177,7 @@ const TableList: React.FC<unknown> = () => {
           </Button>,
         ]}
         request={async (params, sorter, filter) => {
-          const { data, success } = await queryUserList({
+          const { data, success } = await queryServiceList({
             ...params,
             // FIXME: remove @ts-ignore
             // @ts-ignore
@@ -187,7 +201,7 @@ const TableList: React.FC<unknown> = () => {
             <div>
               Chosen{' '}
               <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              item&nbsp;&nbsp;
+              service&nbsp;&nbsp;
             </div>
           }
         >
@@ -200,14 +214,13 @@ const TableList: React.FC<unknown> = () => {
           >
             Batch deletion
           </Button>
-          <Button type="primary">Batch approval</Button>
         </FooterToolbar>
       )}
       <CreateForm
         onCancel={() => handleModalVisible(false)}
         modalVisible={createModalVisible}
       >
-        <ProTable<API.UserInfo, API.UserInfo>
+        <ProTable<API.Service, API.Service>
           onSubmit={async (value) => {
             const success = await handleAdd(value);
             if (success) {
@@ -253,7 +266,7 @@ const TableList: React.FC<unknown> = () => {
         closable={false}
       >
         {row?.name && (
-          <ProDescriptions<API.UserInfo>
+          <ProDescriptions<API.Service>
             column={2}
             title={row?.name}
             request={async () => ({

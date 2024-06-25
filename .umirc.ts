@@ -16,7 +16,12 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      redirect: '/home',
+      redirect: '/services',
+    },
+    {
+      name: 'Services',
+      path: '/services',
+      component: './Services',
     },
     {
       name: 'Home',
