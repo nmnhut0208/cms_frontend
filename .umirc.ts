@@ -11,7 +11,7 @@ export default defineConfig({
   initialState: {},
   request: {},
   layout: {
-    title: '@umijs/max',
+    title: 'Stable Diffusion',
   },
   routes: [
     {
@@ -24,24 +24,8 @@ export default defineConfig({
       component: './Services',
     },
     {
-      // name: 'Sub-services',
       path: '/services/:id',
-      component: './Services/:id',
-    },
-    {
-      name: 'Home',
-      path: '/home',
-      component: './Home',
-    },
-    {
-      name: 'Access Control',
-      path: '/access',
-      component: './Access',
-    },
-    {
-      name: 'CRUD Example',
-      path: '/table',
-      component: './Table',
+      component: './Items',
     },
   ],
   npmClient: 'pnpm',
