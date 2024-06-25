@@ -7,6 +7,7 @@ import {
   ProDescriptionsItemProps,
   ProTable,
 } from '@ant-design/pro-components';
+import { Link } from '@umijs/max';
 import { Button, Divider, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
@@ -87,7 +88,7 @@ const TableList: React.FC<unknown> = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] =
     useState<boolean>(false);
-  const [stepFormValues, setStepFormValues] = useState({});
+  const [formValues, setFormValues] = useState({});
   const actionRef = useRef<ActionType>();
   const [row, setRow] = useState<API.Service>();
   const [selectedRowsState, setSelectedRows] = useState<API.Service[]>([]);
@@ -105,16 +106,20 @@ const TableList: React.FC<unknown> = () => {
           },
         ],
       },
+      render: (dom, entity) => {
+        return <Link to={`/services/${entity.id}`}>{dom}</Link>;
+      },
     },
     {
       title: 'Code',
       dataIndex: 'code',
       valueType: 'text',
+      hideInForm: true,
     },
     {
       title: 'Description',
       dataIndex: 'description',
-      valueType: 'text',
+      valueType: 'textarea',
       hideInSearch: true,
       hideInTable: true,
     },
@@ -122,8 +127,16 @@ const TableList: React.FC<unknown> = () => {
       title: 'Type',
       dataIndex: 'type',
       valueEnum: {
-        0: { text: 'Txt2Img', status: 'txt2img' },
-        1: { text: 'Img2Img', status: 'img2img' },
+        0: { text: 'Text to Image', status: 'txt2img' },
+        1: { text: 'Image to Image', status: 'img2img' },
+      },
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: 'Type is required',
+          },
+        ],
       },
     },
     {
@@ -135,7 +148,7 @@ const TableList: React.FC<unknown> = () => {
           <a
             onClick={() => {
               handleUpdateModalVisible(true);
-              setStepFormValues(record);
+              setFormValues(record);
             }}
           >
             Configure
@@ -236,13 +249,13 @@ const TableList: React.FC<unknown> = () => {
           columns={columns}
         />
       </CreateForm>
-      {stepFormValues && Object.keys(stepFormValues).length ? (
+      {formValues && Object.keys(formValues).length ? (
         <UpdateForm
           onSubmit={async (value) => {
             const success = await handleUpdate(value);
             if (success) {
               handleUpdateModalVisible(false);
-              setStepFormValues({});
+              setFormValues({});
               if (actionRef.current) {
                 actionRef.current.reload();
               }
@@ -250,10 +263,10 @@ const TableList: React.FC<unknown> = () => {
           }}
           onCancel={() => {
             handleUpdateModalVisible(false);
-            setStepFormValues({});
+            setFormValues({});
           }}
           updateModalVisible={updateModalVisible}
-          values={stepFormValues}
+          values={formValues}
         />
       ) : null}
 

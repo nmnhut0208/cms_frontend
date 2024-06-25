@@ -24,6 +24,11 @@ export default defineConfig({
       component: './Services',
     },
     {
+      // name: 'Sub-services',
+      path: '/services/:id',
+      component: './Services/:id',
+    },
+    {
       name: 'Home',
       path: '/home',
       component: './Home',

@@ -37,10 +37,20 @@ export default {
     });
   },
   'PUT /api/v1/service/:id': (req: any, res: any) => {
+    console.log(req);
     res.json({
       success: true,
       errorCode: 0,
-      req: req,
+    });
+  },
+  'DELETE /api/v1/service/:id': (req: any, res: any) => {
+    delete services[
+      services.findIndex((service) => service.id === req?.params?.id)
+    ];
+    res.json({
+      success: true,
+      data: services,
+      errorCode: 0,
     });
   },
 };
