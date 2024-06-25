@@ -8,11 +8,11 @@ const SubServicePage: React.FC = () => {
     <PageContainer
       ghost
       header={{
-        title: 'Sub-service example',
+        title: "Service's items",
       }}
     >
       <div>
-        <h1>Sub-service example</h1>
+        <h1>Items example</h1>
         <p>Params: {JSON.stringify(params)}</p>
       </div>
     </PageContainer>
