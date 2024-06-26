@@ -1,4 +1,5 @@
 import services from '@/services/demo';
+import { trim } from '@/utils/format';
 import {
   ActionType,
   FooterToolbar,
@@ -23,7 +24,11 @@ const { addService, queryServiceList, modifyService, deleteService } =
 const handleAdd = async (fields: API.Service) => {
   const hide = message.loading('Adding');
   try {
-    await addService({ ...fields });
+    await addService({
+      ...fields,
+      name: trim(fields.name),
+      code: trim(fields.name).toLowerCase().replaceAll(' ', '_'),
+    });
     hide();
     message.success('Added successfully');
     return true;
@@ -43,13 +48,13 @@ const handleUpdate = async (fields: FormValueType) => {
   try {
     await modifyService(
       {
-        serviceId: fields.id,
+        serviceId: fields.code,
       },
       {
         name: fields.name || '',
         code: fields.code || '',
         description: fields.description || '',
-        type: fields.type as API.ServiceTypeEnum,
+        type: fields.type || 'txt2img',
       },
     );
     hide();
@@ -72,7 +77,7 @@ const handleRemove = async (selectedRows: API.Service[]) => {
   if (!selectedRows) return true;
   try {
     await deleteService({
-      serviceId: selectedRows.find((row) => row.id)?.id,
+      serviceId: selectedRows.find((row) => row.code)?.code,
     });
     hide();
     message.success('Deleted successfully, will be refreshed soon');
@@ -107,7 +112,7 @@ const TableList: React.FC<unknown> = () => {
         ],
       },
       render: (dom, entity) => {
-        return <Link to={`/services/${entity.id}`}>{dom}</Link>;
+        return <Link to={`/services/${entity.code}`}>{dom}</Link>;
       },
     },
     {
@@ -127,8 +132,8 @@ const TableList: React.FC<unknown> = () => {
       title: 'Type',
       dataIndex: 'type',
       valueEnum: {
-        0: { text: 'Text to Image', status: 'txt2img' },
-        1: { text: 'Image to Image', status: 'img2img' },
+        txt2img: 'Text to Image',
+        img2img: 'Image to Image',
       },
       formItemProps: {
         rules: [
@@ -176,7 +181,7 @@ const TableList: React.FC<unknown> = () => {
       <ProTable<API.Service>
         headerTitle="Service List"
         actionRef={actionRef}
-        rowKey="id"
+        rowKey="code"
         search={{
           labelWidth: 120,
         }}
@@ -190,7 +195,7 @@ const TableList: React.FC<unknown> = () => {
           </Button>,
         ]}
         request={async (params, sorter, filter) => {
-          const { data, success } = await queryServiceList({
+          const data = await queryServiceList({
             ...params,
             // FIXME: remove @ts-ignore
             // @ts-ignore
@@ -198,8 +203,7 @@ const TableList: React.FC<unknown> = () => {
             filter,
           });
           return {
-            data: data?.list || [],
-            success,
+            data: data || [],
           };
         }}
         // @ts-ignore

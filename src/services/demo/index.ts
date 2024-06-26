@@ -1,8 +1,8 @@
 /* eslint-disable */
 import * as ServiceController from './ServiceController';
-import * as UserController from './UserController';
+import * as ServiceItemController from './ServiceItemController';
 
 export default {
-  UserController,
   ServiceController,
+  ServiceItemController,
 };

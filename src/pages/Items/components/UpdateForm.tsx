@@ -7,7 +7,7 @@ import {
 import { Modal } from 'antd';
 import React from 'react';
 
-export interface FormValueType extends Partial<API.Service> {
+export interface FormValueType extends Partial<API.ServiceItem> {
   target?: string;
   template?: string;
   type?: string;
@@ -19,7 +19,7 @@ export interface UpdateFormProps {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (values: FormValueType) => Promise<void>;
   updateModalVisible: boolean;
-  values: Partial<API.Service>;
+  values: Partial<API.ServiceItem>;
 }
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => (
@@ -43,7 +43,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => (
       initialValues={{
         name: props.values.name,
         code: props.values.code,
-        type: props.values.type,
+        properties: props.values.properties,
         description: props.values.description,
       }}
     >

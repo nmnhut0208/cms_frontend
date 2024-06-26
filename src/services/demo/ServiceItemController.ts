@@ -2,30 +2,20 @@
 import { request } from '@umijs/max';
 
 /** GET /cms/get_categories */
-export async function queryServiceList(
-  params: {
-    // query
-    /** keyword */
-    keyword?: string;
-    /** current */
-    current?: number;
-    /** pageSize */
-    pageSize?: number;
-  },
-  options?: { [key: string]: any },
-) {
-  console.log(params, options);
+export async function queryServiceItemList(
+  serviceCode: string,
+): Promise<API.ServiceItem[]> {
   return request<API.Service[]>('/cms/get_categories', {
     method: 'GET',
-    params,
-    ...options,
-  });
+  }).then(
+    (res) => res.find((service) => service.code === serviceCode)?.items || [],
+  );
 }
 
 /** No comments are provided by the backend here
  *  POST /crud/create/cms */
-export async function addService(
-  body?: API.ServiceVO,
+export async function addServiceItem(
+  body?: API.ServiceItemVO,
   options?: { [key: string]: any },
 ) {
   return request<any>('/crud/create/cms', {
@@ -39,17 +29,17 @@ export async function addService(
 }
 
 /** No comments are provided by the backend here
- *  GET /api/v1/service/${id} */
-export async function getServiceDetail(
+ *  GET /api/v1/ServiceItem/${id} */
+export async function getServiceItemDetail(
   params: {
     // path
-    /** serviceId */
-    serviceId?: string;
+    /** serviceItemId */
+    serviceItemId?: string;
   },
   options?: { [key: string]: any },
 ) {
-  const { serviceId: id } = params;
-  return request<API.Service>(`/api/v1/service/${id}`, {
+  const { serviceItemId: id } = params;
+  return request<API.ServiceItem>(`/api/v1/ServiceItem/${id}`, {
     method: 'GET',
     params: { ...params },
     ...(options || {}),
@@ -57,18 +47,18 @@ export async function getServiceDetail(
 }
 
 /** No comments are provided by the backend here
- *  PUT /api/v1/service/${id} */
-export async function modifyService(
+ *  PUT /api/v1/ServiceItem/${id} */
+export async function modifyServiceItem(
   params: {
     // path
-    /** serviceId */
-    serviceId?: string;
+    /** serviceItemId */
+    serviceItemId?: string;
   },
-  body?: API.ServiceVO,
+  body?: API.ServiceItemVO,
   options?: { [key: string]: any },
 ) {
-  const { serviceId: id } = params;
-  return request<API.Service>(`/api/v1/service/${id}`, {
+  const { serviceItemId: id } = params;
+  return request<API.ServiceItem>(`/api/v1/ServiceItem/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -80,17 +70,17 @@ export async function modifyService(
 }
 
 /** No comments are provided by the backend here
- *  DELETE /api/v1/service/${id} */
-export async function deleteService(
+ *  DELETE /api/v1/ServiceItem/${id} */
+export async function deleteServiceItem(
   params: {
     // path
-    /** serviceId */
-    serviceId?: string;
+    /** serviceItemId */
+    serviceItemId?: string;
   },
   options?: { [key: string]: any },
 ) {
-  const { serviceId: id } = params;
-  return request<API.Result_string_>(`/api/v1/service/${id}`, {
+  const { serviceItemId: id } = params;
+  return request<API.Result_string_>(`/api/v1/ServiceItem/${id}`, {
     method: 'DELETE',
     params: { ...params },
     ...(options || {}),

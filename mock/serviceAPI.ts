@@ -1,13 +1,13 @@
 const services: API.Service[] = [
   {
-    id: 0,
+    id: '0',
     name: 'Change hair',
     code: 'change_hair',
     description: 'Change hair to different styles',
     type: 'txt2img',
   },
   {
-    id: 1,
+    id: '1',
     name: 'Change outfit',
     code: 'change_outfit',
     description: 'Change oufit to different styles',
