@@ -26,8 +26,8 @@ const handleAdd = async (fields: API.Service) => {
   try {
     await addService({
       ...fields,
-      name: trim(fields.name),
-      code: trim(fields.name).toLowerCase().replaceAll(' ', '_'),
+      fullName: trim(fields.fullName),
+      name: trim(fields.fullName).toLowerCase().replaceAll(' ', '_'),
     });
     hide();
     message.success('Added successfully');
@@ -48,11 +48,13 @@ const handleUpdate = async (fields: FormValueType) => {
   try {
     await modifyService(
       {
-        serviceId: fields.code,
+        serviceName: fields.name,
       },
       {
-        name: fields.name || '',
-        code: fields.code || '',
+        name: trim(fields.fullName || '')
+          .toLowerCase()
+          .replaceAll(' ', '_'),
+        fullName: fields.fullName || '',
         description: fields.description || '',
         type: fields.type || 'txt2img',
       },
@@ -77,7 +79,7 @@ const handleRemove = async (selectedRows: API.Service[]) => {
   if (!selectedRows) return true;
   try {
     await deleteService({
-      serviceId: selectedRows.find((row) => row.code)?.code,
+      serviceName: selectedRows.find((row) => row.name)?.name,
     });
     hide();
     message.success('Deleted successfully, will be refreshed soon');
@@ -100,7 +102,7 @@ const TableList: React.FC<unknown> = () => {
   const columns: ProDescriptionsItemProps<API.Service>[] = [
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'fullName',
       // @ts-ignore
       tip: 'Name is an unique key',
       formItemProps: {
@@ -112,12 +114,12 @@ const TableList: React.FC<unknown> = () => {
         ],
       },
       render: (dom, entity) => {
-        return <Link to={`/services/${entity.code}`}>{dom}</Link>;
+        return <Link to={`/services/${entity.name}`}>{dom}</Link>;
       },
     },
     {
       title: 'Code',
-      dataIndex: 'code',
+      dataIndex: 'name',
       valueType: 'text',
       hideInForm: true,
     },
@@ -181,7 +183,7 @@ const TableList: React.FC<unknown> = () => {
       <ProTable<API.Service>
         headerTitle="Service List"
         actionRef={actionRef}
-        rowKey="code"
+        rowKey="name"
         search={{
           labelWidth: 120,
         }}

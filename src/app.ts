@@ -18,5 +18,5 @@ export const layout = () => {
 };
 
 export const request: RequestConfig = {
-  baseURL: 'https://flutter-backend-jhac.onrender.com/backend',
+  baseURL: 'https://flutter-backend-jhac.onrender.com/backend/cms',
 };

@@ -66,8 +66,8 @@ declare namespace API {
   };
 
   type ServiceItem = {
-    name: string;
-    code: string;
+    name: string; // code/id
+    fullName: string;
     properties: Array<ServiceItemProperty>;
     description?: string;
     imgUrl?: string;
@@ -77,7 +77,7 @@ declare namespace API {
 
   type ServiceItemVO = {
     name: string;
-    code: string;
+    fullName: string;
     description?: string;
     imgUrl?: string;
     payload?: Record<string, any>;
@@ -85,8 +85,8 @@ declare namespace API {
   };
 
   type Service = {
-    name: string;
-    code: string;
+    name: string; // code/id
+    fullName: string;
     description?: string;
     type: string; // [txt2img, img2img]
     items: Array<ServiceItem>;
@@ -95,7 +95,7 @@ declare namespace API {
 
   interface ServiceVO {
     name: string;
-    code: string;
+    fullName: string;
     description?: string;
     type: string;
   }

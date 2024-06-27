@@ -1,17 +1,17 @@
 const services: API.Service[] = [
   {
-    id: '0',
-    name: 'Change hair',
-    code: 'change_hair',
+    fullName: 'Change hair',
+    name: 'change_hair',
     description: 'Change hair to different styles',
     type: 'txt2img',
+    items: [],
   },
   {
-    id: '1',
-    name: 'Change outfit',
-    code: 'change_outfit',
+    fullName: 'Change outfit',
+    name: 'change_outfit',
     description: 'Change oufit to different styles',
     type: 'img2img',
+    items: [],
   },
 ];
 
@@ -26,7 +26,7 @@ export default {
   'GET /api/v1/service/:id': (req: any, res: any) => {
     res.json({
       success: true,
-      data: services.find((service) => service.id === req?.params?.id),
+      data: services.find((service) => service.name === req?.params?.id),
       errorCode: 0,
     });
   },
@@ -45,7 +45,7 @@ export default {
   },
   'DELETE /api/v1/service/:id': (req: any, res: any) => {
     delete services[
-      services.findIndex((service) => service.id === req?.params?.id)
+      services.findIndex((service) => service.name === req?.params?.id)
     ];
     res.json({
       success: true,

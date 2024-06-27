@@ -25,14 +25,17 @@ const {
  * Adding Nodes
  * @param fields
  */
-const handleAdd = async (fields: API.ServiceItem) => {
+const handleAdd = async (serviceName: string, fields: API.ServiceItem) => {
   const hide = message.loading('Adding');
   try {
-    await addServiceItem({
-      ...fields,
-      name: trim(fields.name),
-      code: trim(fields.name).toLowerCase().replaceAll(' ', '_'),
-    });
+    await addServiceItem(
+      { serviceName },
+      {
+        ...fields,
+        fullName: trim(fields.fullName),
+        name: trim(fields.fullName).toLowerCase().replaceAll(' ', '_'),
+      },
+    );
     hide();
     message.success('Added successfully');
     return true;
@@ -47,16 +50,19 @@ const handleAdd = async (fields: API.ServiceItem) => {
  * Update Node
  * @param fields
  */
-const handleUpdate = async (fields: FormValueType) => {
+const handleUpdate = async (serviceName: string, fields: FormValueType) => {
   const hide = message.loading('Configuring');
   try {
     await modifyServiceItem(
       {
-        serviceItemId: fields.code,
+        serviceName,
+        serviceItemName: fields.name || '',
       },
       {
-        name: fields.name || '',
-        code: fields.code || '',
+        name: trim(fields.fullName || '')
+          .toLowerCase()
+          .replaceAll(' ', '_'),
+        fullName: trim(fields.fullName || ''),
         description: fields.description || '',
         properties: fields.properties || [],
       },
@@ -76,12 +82,16 @@ const handleUpdate = async (fields: FormValueType) => {
  *  Deleting a Node
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.ServiceItem[]) => {
+const handleRemove = async (
+  serviceName: string,
+  selectedRows: API.ServiceItem[],
+) => {
   const hide = message.loading('Deleting');
   if (!selectedRows) return true;
   try {
     await deleteServiceItem({
-      serviceItemId: selectedRows.find((row) => row.code)?.code,
+      serviceName,
+      serviceItemName: selectedRows.find((row) => row.name)?.name || '',
     });
     hide();
     message.success('Deleted successfully, will be refreshed soon');
@@ -94,7 +104,7 @@ const handleRemove = async (selectedRows: API.ServiceItem[]) => {
 };
 
 const TableList: React.FC<unknown> = () => {
-  const params = useParams();
+  const params = useParams<{ serviceName: string }>();
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] =
     useState<boolean>(false);
@@ -105,7 +115,7 @@ const TableList: React.FC<unknown> = () => {
   const columns: ProDescriptionsItemProps<API.ServiceItem>[] = [
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'fullName',
       // @ts-ignore
       tip: 'Name is an unique key',
       formItemProps: {
@@ -119,7 +129,7 @@ const TableList: React.FC<unknown> = () => {
     },
     {
       title: 'Code',
-      dataIndex: 'code',
+      dataIndex: 'name',
       valueType: 'text',
       hideInForm: true,
     },
@@ -147,7 +157,7 @@ const TableList: React.FC<unknown> = () => {
           <Divider type="vertical" />
           <a
             onClick={() => {
-              handleRemove([record]);
+              handleRemove(params.serviceName || '', [record]);
               actionRef.current?.reloadAndRest?.();
             }}
           >
@@ -161,13 +171,13 @@ const TableList: React.FC<unknown> = () => {
   return (
     <PageContainer
       header={{
-        title: 'ServiceItems',
+        title: `${params.serviceName} items`,
       }}
     >
       <ProTable<API.ServiceItem>
-        headerTitle="ServiceItem List"
+        headerTitle={`${params.serviceName} item list`}
         actionRef={actionRef}
-        rowKey="code"
+        rowKey="name"
         search={{
           labelWidth: 120,
         }}
@@ -181,8 +191,7 @@ const TableList: React.FC<unknown> = () => {
           </Button>,
         ]}
         request={async () => {
-          console.log('params.code', params.code);
-          const data = await queryServiceItemList(params.code || '');
+          const data = await queryServiceItemList(params.serviceName || '');
           return {
             data: data || [],
           };
@@ -205,7 +214,7 @@ const TableList: React.FC<unknown> = () => {
         >
           <Button
             onClick={async () => {
-              await handleRemove(selectedRowsState);
+              await handleRemove(params.serviceName || '', selectedRowsState);
               setSelectedRows([]);
               actionRef.current?.reloadAndRest?.();
             }}
@@ -220,7 +229,7 @@ const TableList: React.FC<unknown> = () => {
       >
         <ProTable<API.ServiceItem, API.ServiceItem>
           onSubmit={async (value) => {
-            const success = await handleAdd(value);
+            const success = await handleAdd(params.serviceName || '', value);
             if (success) {
               handleModalVisible(false);
               if (actionRef.current) {
@@ -237,7 +246,7 @@ const TableList: React.FC<unknown> = () => {
       {formValues && Object.keys(formValues).length ? (
         <UpdateForm
           onSubmit={async (value) => {
-            const success = await handleUpdate(value);
+            const success = await handleUpdate(params.serviceName || '', value);
             if (success) {
               handleUpdateModalVisible(false);
               setFormValues({});

@@ -42,14 +42,14 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => (
       onFinish={props.onSubmit}
       initialValues={{
         name: props.values.name,
-        code: props.values.code,
+        fullName: props.values.fullName,
         type: props.values.type,
         description: props.values.description,
       }}
     >
       <ProFormText
         width="md"
-        name="name"
+        name="fullName"
         label="Name"
         rules={[{ required: true, message: 'Please enter a service name!' }]}
       />

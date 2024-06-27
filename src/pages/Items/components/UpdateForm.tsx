@@ -27,7 +27,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => (
     width={640}
     style={{ padding: '32px 40px 48px' }}
     destroyOnClose
-    title="Service configuration"
+    title="Service item configuration"
     open={props.updateModalVisible}
     onCancel={() => props.onCancel()}
     onOk={() => props.onSubmit(props.values)}
@@ -42,16 +42,16 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => (
       onFinish={props.onSubmit}
       initialValues={{
         name: props.values.name,
-        code: props.values.code,
+        fullName: props.values.fullName,
         properties: props.values.properties,
         description: props.values.description,
       }}
     >
       <ProFormText
         width="md"
-        name="name"
+        name="fullName"
         label="Name"
-        rules={[{ required: true, message: 'Please enter a service name!' }]}
+        rules={[{ required: true, message: 'Please enter an item name!' }]}
       />
       <ProFormTextArea name="description" width="md" label="Description" />
       <ProFormSelect

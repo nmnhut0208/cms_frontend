@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** GET /cms/get_categories */
+/** GET /get_categories */
 export async function queryServiceList(
   params: {
     // query
@@ -15,7 +15,7 @@ export async function queryServiceList(
   options?: { [key: string]: any },
 ) {
   console.log(params, options);
-  return request<API.Service[]>('/cms/get_categories', {
+  return request<API.Service[]>('/get_categories', {
     method: 'GET',
     params,
     ...options,
@@ -23,12 +23,12 @@ export async function queryServiceList(
 }
 
 /** No comments are provided by the backend here
- *  POST /crud/create/cms */
+ *  POST /add_category */
 export async function addService(
   body?: API.ServiceVO,
   options?: { [key: string]: any },
 ) {
-  return request<any>('/crud/create/cms', {
+  return request<any>('/add_category', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -39,36 +39,16 @@ export async function addService(
 }
 
 /** No comments are provided by the backend here
- *  GET /api/v1/service/${id} */
-export async function getServiceDetail(
-  params: {
-    // path
-    /** serviceId */
-    serviceId?: string;
-  },
-  options?: { [key: string]: any },
-) {
-  const { serviceId: id } = params;
-  return request<API.Service>(`/api/v1/service/${id}`, {
-    method: 'GET',
-    params: { ...params },
-    ...(options || {}),
-  });
-}
-
-/** No comments are provided by the backend here
- *  PUT /api/v1/service/${id} */
+ *  PUT /update_category/${id} */
 export async function modifyService(
   params: {
-    // path
-    /** serviceId */
-    serviceId?: string;
+    serviceName?: string;
   },
   body?: API.ServiceVO,
   options?: { [key: string]: any },
 ) {
-  const { serviceId: id } = params;
-  return request<API.Service>(`/api/v1/service/${id}`, {
+  const { serviceName: name } = params;
+  return request<API.Service>(`/update_category/${name}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -80,17 +60,15 @@ export async function modifyService(
 }
 
 /** No comments are provided by the backend here
- *  DELETE /api/v1/service/${id} */
+ *  DELETE /delete_category/${id} */
 export async function deleteService(
   params: {
-    // path
-    /** serviceId */
-    serviceId?: string;
+    serviceName?: string;
   },
   options?: { [key: string]: any },
 ) {
-  const { serviceId: id } = params;
-  return request<API.Result_string_>(`/api/v1/service/${id}`, {
+  const { serviceName: name } = params;
+  return request<API.Result_string_>(`/delete_category/${name}`, {
     method: 'DELETE',
     params: { ...params },
     ...(options || {}),

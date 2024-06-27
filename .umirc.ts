@@ -24,7 +24,7 @@ export default defineConfig({
       component: './Services',
     },
     {
-      path: '/services/:code',
+      path: '/services/:serviceName',
       component: './Items',
     },
   ],
