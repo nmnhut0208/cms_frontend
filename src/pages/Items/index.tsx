@@ -6,6 +6,9 @@ import {
   PageContainer,
   ProDescriptions,
   ProDescriptionsItemProps,
+  ProFormList,
+  ProFormSelect,
+  ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
 import { useParams } from '@umijs/max';
@@ -132,6 +135,58 @@ const TableList: React.FC<unknown> = () => {
       dataIndex: 'name',
       valueType: 'text',
       hideInForm: true,
+    },
+    {
+      title: 'Properties',
+      dataIndex: 'properties',
+      valueType: 'formList',
+      hideInTable: true,
+      hideInSearch: true,
+      renderFormItem: () => (
+        <ProFormList name="properties">
+          {(
+            // Basic information of the current row {name: number; key: number}
+            _meta,
+            // current line number
+            _index,
+            /**
+             * action
+             * @name some shortcut methods for manipulating rows
+             * @example add data to the second line action.add?.({},1);
+             * @example delete the second line action.remove?.(1);
+             * @example moved from 1 to 2: action.move?.(2,1);
+             * @example Get the data of the current row: action.getCurrentRowData() -> {id:"xxx",name:'123',age:18}
+             * @example Set current row data: {id:"123",name:'123'} -> action.setCurrentRowData({name:'xxx'}) -> {id:"123",name:'xxx' }
+             * @example clear the data of the current row: {id:"123",name:'123'} -> action.setCurrentRowData({name:undefined}) -> {id:"123"}
+             */
+            action,
+            // total number of rows
+            // _count,
+          ) => {
+            return (
+              <div key="row">
+                <ProFormText required name="name" placeholder="Property name" />
+                <ProFormSelect
+                  required
+                  name="type"
+                  placeholder="Property type"
+                  valueEnum={{
+                    input: 'Input',
+                    select: 'Select',
+                  }}
+                />
+                {action.getCurrentRowData()?.type === 'select' && (
+                  <ProFormText
+                    required={action.getCurrentRowData()?.type === 'select'}
+                    name="selectOptions"
+                    placeholder="Select values"
+                  />
+                )}
+              </div>
+            );
+          }}
+        </ProFormList>
+      ),
     },
     {
       title: 'Description',

@@ -1,6 +1,5 @@
 import {
   ProForm,
-  ProFormSelect,
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
@@ -54,15 +53,6 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => (
         rules={[{ required: true, message: 'Please enter an item name!' }]}
       />
       <ProFormTextArea name="description" width="md" label="Description" />
-      <ProFormSelect
-        width="md"
-        name="type"
-        label="Type"
-        valueEnum={{
-          txt2img: 'Text to Image',
-          img2img: 'Image to Image',
-        }}
-      />
     </ProForm>
   </Modal>
 );
