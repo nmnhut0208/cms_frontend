@@ -32,7 +32,7 @@ export async function modifyServiceItem(
     serviceItemName: string;
     serviceName: string;
   },
-  body?: API.ServiceItem,
+  body?: API.PartialServiceItem,
   options?: { [key: string]: any },
 ) {
   const { serviceItemName: name, serviceName } = params;

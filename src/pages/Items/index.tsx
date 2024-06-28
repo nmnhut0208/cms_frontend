@@ -3,18 +3,15 @@ import { queryServiceList } from '@/services/demo/ServiceController';
 import { trim } from '@/utils/format';
 import {
   ActionType,
-  FooterToolbar,
   PageContainer,
   ProDescriptions,
   ProDescriptionsItemProps,
-  ProFormList,
-  ProFormSelect,
   ProFormText,
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { useParams } from '@umijs/max';
-import { Button, Divider, Drawer, Image, message } from 'antd';
+import { Button, Divider, Drawer, Flex, Image, Tag, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
@@ -80,7 +77,6 @@ const handleUpdate = async (serviceName: string, fields: FormValueType) => {
           .toLowerCase()
           .replaceAll(' ', '_'),
         fullName: trim(fields.fullName || ''),
-        subcategory: fields.subcategory || '',
         imgUrl: fields.imgUrl || '',
         description: fields.description || '',
         properties: fields.properties || [],
@@ -132,7 +128,6 @@ const TableList: React.FC<unknown> = () => {
   const [formValues, setFormValues] = useState({});
   const actionRef = useRef<ActionType>();
   const [row, setRow] = useState<API.ServiceItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.ServiceItem[]>([]);
   useEffect(() => {
     queryServiceList().then((services) => {
       setService(
@@ -162,15 +157,18 @@ const TableList: React.FC<unknown> = () => {
       valueType: 'text',
       hideInForm: true,
       hideInTable: true,
+      hideInDescriptions: true,
     },
     {
       title: 'Subcategory',
       dataIndex: 'subcategory',
       valueType: 'text',
-      valueEnum: service.subcategories?.split(',').reduce((acc: any, cur) => {
-        acc[cur] = cur.replaceAll('_', ' ');
-        return acc;
-      }, {}),
+      valueEnum: service.subcategories
+        ?.split(/ ?, ?/)
+        .reduce((acc: any, cur) => {
+          acc[cur] = cur.replaceAll('_', ' ');
+          return acc;
+        }, {}),
       formItemProps: {
         rules: [
           {
@@ -181,18 +179,38 @@ const TableList: React.FC<unknown> = () => {
       },
     },
     {
+      title: 'Image',
+      formItemProps: { label: 'Image URL' },
+      dataIndex: 'imgUrl',
+      valueType: 'text',
+      span: 2,
+      renderFormItem: (_schema, config) => (
+        <>
+          <ProFormText name="imgUrl" />
+          <Image
+            style={{ marginBottom: '1rem' }}
+            width={100}
+            src={config.value}
+            fallback={fallbackImage}
+          />
+        </>
+      ),
+      render: (_dom, entity) => (
+        <Image
+          height={100}
+          src={`${entity.imgUrl}?x-oss-process=image/blur,r_50,s_50/quality,q_1/resize,m_mfit,h_100,w_100`}
+          preview={{ src: entity.imgUrl }}
+          fallback={fallbackImage}
+        />
+      ),
+    },
+    {
       title: 'Payload',
       dataIndex: 'payload',
-      valueType: 'textarea',
+      valueType: 'jsonCode',
       hideInTable: true,
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: 'Name is required',
-          },
-        ],
-      },
+      span: 2,
+      // ellipsis: true,
       renderFormItem: () => (
         <ProFormTextArea
           fieldProps={{
@@ -215,81 +233,46 @@ const TableList: React.FC<unknown> = () => {
         />
       ),
     },
-    {
-      title: 'Image URL',
-      dataIndex: 'imgUrl',
-      valueType: 'text',
-      hideInSearch: true,
-      renderFormItem: (schema, config) => (
-        <>
-          <ProFormText name={schema.dataIndex as string} />
-          <Image
-            style={{ marginBottom: '1rem' }}
-            width={100}
-            src={config.value}
-            fallback={fallbackImage}
-          />
-        </>
-      ),
-      render: (_dom, entity) => (
-        <Image
-          height={100}
-          src={`${entity.imgUrl}?x-oss-process=image/blur,r_50,s_50/quality,q_1/resize,m_mfit,h_100,w_100`}
-          preview={{ src: entity.imgUrl }}
-          fallback={fallbackImage}
-        />
-      ),
-    },
+
     {
       title: 'Properties',
       dataIndex: 'properties',
-      valueType: 'jsonCode',
+      valueType: 'formList',
       hideInTable: true,
-      hideInSearch: true,
-      // hideInForm: true,
-      renderFormItem: (schema) => (
-        <ProFormList name={schema.dataIndex as string}>
-          {(
-            // Basic information of the current row {name: number; key: number}
-            _meta,
-            // current line number
-            _index,
-            // action
-            action,
-            // total number of rows
-            // _count,
-          ) => {
-            return (
-              <div key="name">
-                <ProFormText required name="name" placeholder="Property name" />
-                <ProFormSelect
-                  required
-                  name="type"
-                  placeholder="Property type"
-                  valueEnum={{
-                    input: 'Input',
-                    select: 'Select',
-                  }}
-                />
-                {action.getCurrentRowData()?.type === 'select' && (
-                  <ProFormText
-                    required={action.getCurrentRowData()?.type === 'select'}
-                    name="selectOptions"
-                    placeholder="Select values (comma-separated)"
-                  />
+      hideInForm: true,
+      span: 2,
+      render: (_dom, entity) => {
+        return (
+          <Flex gap="4px 0" wrap>
+            {entity.properties?.map((property) => (
+              <div key={property.name} style={{ marginTop: '5px' }}>
+                {property.name}
+                <Divider dashed type="vertical" />
+                {property.type.toUpperCase()}
+                <Divider dashed type="vertical" />
+                {!!property.selectOptions && (
+                  <Flex gap="4px 0" wrap style={{ marginTop: '5px' }}>
+                    {property.selectOptions
+                      ?.split(/ ?, ?/)
+                      .slice(0, 3)
+                      .map((option, index) => (
+                        <Tag key={index}>{option}</Tag>
+                      ))}
+                    <Tag>...</Tag>
+                  </Flex>
                 )}
               </div>
-            );
-          }}
-        </ProFormList>
-      ),
+            ))}
+          </Flex>
+        );
+      },
     },
     {
       title: 'Description',
       dataIndex: 'description',
       valueType: 'textarea',
-      hideInSearch: true,
       hideInTable: true,
+      span: 2,
     },
     {
       title: 'Option',
@@ -297,6 +280,14 @@ const TableList: React.FC<unknown> = () => {
       valueType: 'option',
       render: (_, record) => (
         <>
+          <a
+            onClick={() => {
+              setRow(record);
+            }}
+          >
+            See details
+          </a>
+          <Divider type="vertical" />
           <a
             onClick={() => {
               setFormValues(record);
@@ -329,9 +320,9 @@ const TableList: React.FC<unknown> = () => {
         headerTitle={`${service.fullName} item list`}
         actionRef={actionRef}
         rowKey="name"
-        search={{
-          labelWidth: 120,
-        }}
+        search={false}
+        pagination={false}
+        rowSelection={false}
         toolBarRender={() => [
           <Button
             key="1"
@@ -349,31 +340,7 @@ const TableList: React.FC<unknown> = () => {
         }}
         // @ts-ignore
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => setSelectedRows(selectedRows),
-        }}
       />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              Chosen{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              service item(s)&nbsp;&nbsp;
-            </div>
-          }
-        >
-          <Button
-            onClick={async () => {
-              await handleRemove(service.name || '', selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reloadAndRest?.();
-            }}
-          >
-            Batch deletion
-          </Button>
-        </FooterToolbar>
-      )}
       <CreateForm
         title={`New ${service.fullName} service item`}
         onCancel={() => handleModalVisible(false)}
@@ -426,6 +393,8 @@ const TableList: React.FC<unknown> = () => {
       >
         {row?.name && (
           <ProDescriptions<API.ServiceItem>
+            layout="vertical"
+            colon={false}
             column={2}
             title={row?.name}
             request={async () => ({

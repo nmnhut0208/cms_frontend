@@ -2,7 +2,6 @@ import services from '@/services/demo';
 import { trim } from '@/utils/format';
 import {
   ActionType,
-  FooterToolbar,
   PageContainer,
   ProDescriptions,
   ProDescriptionsItemProps,
@@ -99,7 +98,6 @@ const TableList: React.FC<unknown> = () => {
   const [formValues, setFormValues] = useState<API.PartialService>({});
   const actionRef = useRef<ActionType>();
   const [row, setRow] = useState<API.Service>();
-  const [selectedRowsState, setSelectedRows] = useState<API.Service[]>([]);
   const columns: ProDescriptionsItemProps<API.Service>[] = [
     {
       title: 'Name',
@@ -124,7 +122,7 @@ const TableList: React.FC<unknown> = () => {
       valueType: 'text',
       hideInForm: true,
       hideInTable: true,
-      hideInSearch: true,
+      hideInDescriptions: true,
     },
     {
       title: 'Type',
@@ -145,6 +143,7 @@ const TableList: React.FC<unknown> = () => {
     {
       title: 'Subcategories',
       dataIndex: 'subcategories',
+      span: 2,
       formItemProps: {
         rules: [
           {
@@ -153,10 +152,9 @@ const TableList: React.FC<unknown> = () => {
           },
         ],
       },
-      hideInSearch: true,
       render(_dom, entity) {
-        return entity.subcategories
-          .split(',')
+        return (entity.subcategories || '')
+          .split(/ ?, ?/)
           .map((item: string) => (
             <Tag key={item}>{item.split('_').join(' ')}</Tag>
           ));
@@ -166,8 +164,8 @@ const TableList: React.FC<unknown> = () => {
       title: 'Description',
       dataIndex: 'description',
       valueType: 'textarea',
-      hideInSearch: true,
       hideInTable: true,
+      span: 2,
     },
     {
       title: 'Option',
@@ -175,6 +173,14 @@ const TableList: React.FC<unknown> = () => {
       valueType: 'option',
       render: (_, record) => (
         <>
+          <a
+            onClick={() => {
+              setRow(record);
+            }}
+          >
+            See details
+          </a>
+          <Divider type="vertical" />
           <a
             onClick={() => {
               handleUpdateModalVisible(true);
@@ -189,6 +195,7 @@ const TableList: React.FC<unknown> = () => {
               handleRemove([record]);
               actionRef.current?.reloadAndRest?.();
             }}
+            style={{ color: 'lightred' }}
           >
             Delete
           </a>
@@ -207,9 +214,8 @@ const TableList: React.FC<unknown> = () => {
         headerTitle="Service List"
         actionRef={actionRef}
         rowKey="name"
-        search={{
-          labelWidth: 120,
-        }}
+        search={false}
+        pagination={false}
         toolBarRender={() => [
           <Button
             key="1"
@@ -227,31 +233,7 @@ const TableList: React.FC<unknown> = () => {
         }}
         // @ts-ignore
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => setSelectedRows(selectedRows),
-        }}
       />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              Chosen{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              service&nbsp;&nbsp;
-            </div>
-          }
-        >
-          <Button
-            onClick={async () => {
-              await handleRemove(selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reloadAndRest?.();
-            }}
-          >
-            Batch deletion
-          </Button>
-        </FooterToolbar>
-      )}
       <CreateForm
         onCancel={() => handleModalVisible(false)}
         modalVisible={createModalVisible}
@@ -305,6 +287,7 @@ const TableList: React.FC<unknown> = () => {
           <ProDescriptions<API.Service>
             column={2}
             title={row?.name}
+            colon={false}
             request={async () => ({
               data: row || {},
             })}

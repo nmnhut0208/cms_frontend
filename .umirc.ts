@@ -22,6 +22,7 @@ export default defineConfig({
       name: 'Services',
       path: '/services',
       component: './Services',
+      icon: 'DesktopOutlined',
     },
     {
       path: '/services/:serviceName',
@@ -31,6 +32,7 @@ export default defineConfig({
       name: 'Generate Images',
       path: '/generate',
       component: './Generate',
+      icon: 'FileImageOutlined',
     },
   ],
   npmClient: 'pnpm',
