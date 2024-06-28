@@ -36,9 +36,19 @@ declare namespace API {
   type PartialServiceItem = Partial<ServiceItem>;
 
   type GenerateTask = {
+    upload?: any;
+    numImages?: number;
     serviceName: string;
     itemName: string;
     base64Image: string;
+    properties: Record<string, any>;
+  };
+
+  type GenerateTaskBody = {
+    upload?: any;
+    img: string;
+    category: string;
+    item_name: string;
     properties: Record<string, any>;
   };
 }
