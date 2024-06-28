@@ -27,6 +27,11 @@ export default defineConfig({
       path: '/services/:serviceName',
       component: './Items',
     },
+    {
+      name: 'Generate Images',
+      path: '/generate',
+      component: './Generate',
+    },
   ],
   npmClient: 'pnpm',
 });

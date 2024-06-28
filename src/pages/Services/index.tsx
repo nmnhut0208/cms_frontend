@@ -9,7 +9,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { Link } from '@umijs/max';
-import { Button, Divider, Drawer, message } from 'antd';
+import { Button, Divider, Drawer, Tag, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
@@ -27,7 +27,8 @@ const handleAdd = async (fields: API.Service) => {
     await addService({
       ...fields,
       fullName: trim(fields.fullName),
-      name: trim(fields.fullName).toLowerCase().replaceAll(' ', '_'),
+      name: trim(fields.fullName).replaceAll(' ', '_'),
+      items: [],
     });
     hide();
     message.success('Added successfully');
@@ -45,18 +46,18 @@ const handleAdd = async (fields: API.Service) => {
  */
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('Configuring');
+  console.log(fields);
   try {
     await modifyService(
       {
         serviceName: fields.name,
       },
       {
-        name: trim(fields.fullName || '')
-          .toLowerCase()
-          .replaceAll(' ', '_'),
+        name: trim(fields.fullName || '').replaceAll(' ', '_'),
         fullName: fields.fullName || '',
         description: fields.description || '',
-        type: fields.type || 'txt2img',
+        ai_type: fields.ai_type || 'sd-txt2img',
+        subcategories: fields.subcategories || '',
       },
     );
     hide();
@@ -78,8 +79,8 @@ const handleRemove = async (selectedRows: API.Service[]) => {
   const hide = message.loading('Deleting');
   if (!selectedRows) return true;
   try {
-    await deleteService({
-      serviceName: selectedRows.find((row) => row.name)?.name,
+    selectedRows.forEach(async (row) => {
+      await deleteService({ serviceName: row.name });
     });
     hide();
     message.success('Deleted successfully, will be refreshed soon');
@@ -95,7 +96,7 @@ const TableList: React.FC<unknown> = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] =
     useState<boolean>(false);
-  const [formValues, setFormValues] = useState({});
+  const [formValues, setFormValues] = useState<API.PartialService>({});
   const actionRef = useRef<ActionType>();
   const [row, setRow] = useState<API.Service>();
   const [selectedRowsState, setSelectedRows] = useState<API.Service[]>([]);
@@ -122,20 +123,15 @@ const TableList: React.FC<unknown> = () => {
       dataIndex: 'name',
       valueType: 'text',
       hideInForm: true,
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      valueType: 'textarea',
-      hideInSearch: true,
       hideInTable: true,
+      hideInSearch: true,
     },
     {
       title: 'Type',
       dataIndex: 'type',
       valueEnum: {
-        txt2img: 'Text to Image',
-        img2img: 'Image to Image',
+        'sd-txt2img': 'Text to Image',
+        'sd-img2img': 'Image to Image',
       },
       formItemProps: {
         rules: [
@@ -145,6 +141,33 @@ const TableList: React.FC<unknown> = () => {
           },
         ],
       },
+    },
+    {
+      title: 'Subcategories',
+      dataIndex: 'subcategories',
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: 'At least one subcategory is required',
+          },
+        ],
+      },
+      hideInSearch: true,
+      render(_dom, entity) {
+        return entity.subcategories
+          .split(',')
+          .map((item: string) => (
+            <Tag key={item}>{item.split('_').join(' ')}</Tag>
+          ));
+      },
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      valueType: 'textarea',
+      hideInSearch: true,
+      hideInTable: true,
     },
     {
       title: 'Option',
@@ -196,14 +219,8 @@ const TableList: React.FC<unknown> = () => {
             New
           </Button>,
         ]}
-        request={async (params, sorter, filter) => {
-          const data = await queryServiceList({
-            ...params,
-            // FIXME: remove @ts-ignore
-            // @ts-ignore
-            sorter,
-            filter,
-          });
+        request={async () => {
+          const data = await queryServiceList();
           return {
             data: data || [],
           };

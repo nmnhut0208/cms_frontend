@@ -7,7 +7,7 @@ import {
 import { Modal } from 'antd';
 import React from 'react';
 
-export interface FormValueType extends Partial<API.Service> {
+export interface FormValueType extends API.PartialService {
   target?: string;
   template?: string;
   type?: string;
@@ -19,7 +19,7 @@ export interface UpdateFormProps {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (values: FormValueType) => Promise<void>;
   updateModalVisible: boolean;
-  values: Partial<API.Service>;
+  values: API.PartialService;
 }
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => (
@@ -41,28 +41,26 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => (
       clearOnDestroy={true}
       onFinish={props.onSubmit}
       initialValues={{
-        name: props.values.name,
-        fullName: props.values.fullName,
-        type: props.values.type,
-        description: props.values.description,
+        ...props.values,
       }}
     >
+      <ProFormText required name="fullName" label="Name" />
       <ProFormText
-        width="md"
-        name="fullName"
-        label="Name"
-        rules={[{ required: true, message: 'Please enter a service name!' }]}
+        required
+        name="subcategories"
+        label="Subcategories"
+        placeholder="Enter subcategories separated by commas (e.g. 'Realistic,Chibi')"
       />
-      <ProFormTextArea name="description" width="md" label="Description" />
       <ProFormSelect
-        width="md"
-        name="type"
+        required
+        name="ai_type"
         label="Type"
         valueEnum={{
-          txt2img: 'Text to Image',
-          img2img: 'Image to Image',
+          'sd-txt2img': 'Text to Image',
+          'sd-img2img': 'Image to Image',
         }}
       />
+      <ProFormTextArea name="description" label="Description" />
     </ProForm>
   </Modal>
 );

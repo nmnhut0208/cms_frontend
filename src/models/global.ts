@@ -1,8 +1,8 @@
 // Global variable example
-import { DEFAULT_NAME } from '@/constants';
+import { DEFAULT_FALLBACK_IMAGE, DEFAULT_NAME } from '@/constants';
 import { useState } from 'react';
 
-const useUser = () => {
+export const useUser = () => {
   const [name, setName] = useState<string>(DEFAULT_NAME);
   return {
     name,
@@ -10,4 +10,4 @@ const useUser = () => {
   };
 };
 
-export default useUser;
+export const fallbackImage = DEFAULT_FALLBACK_IMAGE;

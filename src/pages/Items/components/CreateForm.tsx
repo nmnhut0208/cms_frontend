@@ -2,18 +2,18 @@ import { Modal } from 'antd';
 import React, { PropsWithChildren } from 'react';
 
 interface CreateFormProps {
+  title: string;
   modalVisible: boolean;
   onCancel: () => void;
 }
 
 const CreateForm: React.FC<PropsWithChildren<CreateFormProps>> = (props) => {
-  const { modalVisible, onCancel } = props;
+  const { modalVisible, onCancel, title } = props;
 
   return (
     <Modal
       destroyOnClose
-      title="New Service Item"
-      width={420}
+      title={title}
       open={modalVisible}
       onCancel={() => onCancel()}
       footer={null}

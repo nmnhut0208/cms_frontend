@@ -14,7 +14,7 @@ export async function queryServiceItemList(
  *  POST /add_item/${serviceName} */
 export async function addServiceItem(
   params: { serviceName: string },
-  body?: API.ServiceItemVO,
+  body?: API.ServiceItem,
 ) {
   return request<any>(`/add_item/${params.serviceName}`, {
     method: 'POST',
@@ -32,16 +32,15 @@ export async function modifyServiceItem(
     serviceItemName: string;
     serviceName: string;
   },
-  body?: API.ServiceItemVO,
+  body?: API.ServiceItem,
   options?: { [key: string]: any },
 ) {
   const { serviceItemName: name, serviceName } = params;
   return request<API.ServiceItem>(`/update_item/${serviceName}/${name}`, {
-    method: 'PUT',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    params: { ...params },
     data: body,
     ...(options || {}),
   });

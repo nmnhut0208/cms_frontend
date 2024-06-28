@@ -3,15 +3,17 @@ const services: API.Service[] = [
     fullName: 'Change hair',
     name: 'change_hair',
     description: 'Change hair to different styles',
-    type: 'txt2img',
+    ai_type: 'txt2img',
     items: [],
+    subcategories: 'Realistic, Chibi',
   },
   {
     fullName: 'Change outfit',
     name: 'change_outfit',
     description: 'Change oufit to different styles',
-    type: 'img2img',
+    ai_type: 'img2img',
     items: [],
+    subcategories: 'Realistic, Chibi',
   },
 ];
 
