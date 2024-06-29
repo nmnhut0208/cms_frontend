@@ -32,7 +32,7 @@ const {
  */
 const handleAdd = async (
   serviceName: string,
-  fields: API.PartialServiceItem,
+  fields: API.PartialServiceItemForm,
 ) => {
   const hide = message.loading('Adding');
   try {
@@ -45,7 +45,7 @@ const handleAdd = async (
         name: trim(fields.fullName || '')
           .toLowerCase()
           .replaceAll(' ', '_'),
-        payload: fields.payload || {},
+        payload: JSON.parse(fields.payload || '{}'),
         properties: fields.properties || [],
       },
     );
@@ -66,7 +66,6 @@ const handleAdd = async (
 const handleUpdate = async (serviceName: string, fields: FormValueType) => {
   const hide = message.loading('Configuring');
   try {
-    console.log(fields);
     await modifyServiceItem(
       {
         serviceName,
@@ -80,7 +79,7 @@ const handleUpdate = async (serviceName: string, fields: FormValueType) => {
         imgUrl: fields.imgUrl || '',
         description: fields.description || '',
         properties: fields.properties || [],
-        payload: fields.payload,
+        payload: JSON.parse(fields.payload || '{}'),
       },
     );
     hide();
@@ -211,6 +210,13 @@ const TableList: React.FC<unknown> = () => {
       hideInTable: true,
       span: 2,
       // ellipsis: true,
+      render: (_dom, entity) => (
+        <pre
+          style={{ whiteSpace: 'pre-wrap', padding: '5px', border: 'grey 2px' }}
+        >
+          {JSON.stringify(entity.payload, null, 2)}
+        </pre>
+      ),
       renderFormItem: () => (
         <ProFormTextArea
           fieldProps={{
@@ -346,7 +352,7 @@ const TableList: React.FC<unknown> = () => {
         onCancel={() => handleModalVisible(false)}
         modalVisible={createModalVisible}
       >
-        <ProTable<API.ServiceItem, API.PartialServiceItem>
+        <ProTable<API.ServiceItem, API.PartialServiceItemForm>
           onSubmit={async (value) => {
             const success = await handleAdd(service.name || '', value);
             if (success) {

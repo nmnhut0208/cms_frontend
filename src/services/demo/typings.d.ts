@@ -22,6 +22,16 @@ declare namespace API {
     otherInfo?: Record<string, any>;
   };
 
+  type ServiceItemForm = {
+    name: string; // code/id
+    fullName: string;
+    subcategory: string;
+    properties: Array<ServiceItemProperty>;
+    description?: string;
+    imgUrl?: string;
+    payload?: string;
+  };
+
   type Service = {
     name: string; // code/id
     fullName: string;
@@ -34,6 +44,7 @@ declare namespace API {
 
   type PartialService = Partial<Service>;
   type PartialServiceItem = Partial<ServiceItem>;
+  type PartialServiceItemForm = Partial<ServiceItemForm>;
 
   type GenerateTask = {
     upload?: any;

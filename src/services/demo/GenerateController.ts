@@ -10,5 +10,7 @@ export async function generateImage(body?: API.GenerateTaskBody) {
       'Content-Type': 'application/json',
     },
     data: body,
+    // 1 minute timeout
+    timeout: 60000,
   });
 }
