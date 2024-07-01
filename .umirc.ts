@@ -1,6 +1,7 @@
 import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
+  define: { 'process.env.BACKEND_URI': process.env.BACKEND_URI },
   locale: {
     default: 'en-US',
     baseSeparator: '-',
@@ -33,6 +34,12 @@ export default defineConfig({
       path: '/generate',
       component: './Generate',
       icon: 'FileImageOutlined',
+    },
+    {
+      name: 'Test Payload',
+      path: '/test-payload',
+      component: './TestPayload',
+      icon: 'BugOutlined',
     },
   ],
   npmClient: 'pnpm',

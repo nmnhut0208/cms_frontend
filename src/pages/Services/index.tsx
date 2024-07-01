@@ -126,7 +126,7 @@ const TableList: React.FC<unknown> = () => {
     },
     {
       title: 'Type',
-      dataIndex: 'type',
+      dataIndex: 'ai_type',
       valueEnum: {
         'sd-txt2img': 'Text to Image',
         'sd-img2img': 'Image to Image',

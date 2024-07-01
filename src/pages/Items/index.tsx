@@ -197,6 +197,7 @@ const TableList: React.FC<unknown> = () => {
       render: (_dom, entity) => (
         <Image
           height={100}
+          style={{ maxWidth: '100px' }}
           src={`${entity.imgUrl}?x-oss-process=image/blur,r_50,s_50/quality,q_1/resize,m_mfit,h_100,w_100`}
           preview={{ src: entity.imgUrl }}
           fallback={fallbackImage}
