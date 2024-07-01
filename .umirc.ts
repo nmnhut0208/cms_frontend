@@ -1,7 +1,7 @@
 import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
-  define: { 'process.env.BACKEND_URI': process.env.BACKEND_URI },
+  // define: { 'process.env.BACKEND_URI': process.env.BACKEND_URI },
   locale: {
     default: 'en-US',
     baseSeparator: '-',
