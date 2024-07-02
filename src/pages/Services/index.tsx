@@ -1,3 +1,4 @@
+import DeleteButton from '@/components/DeleteButton';
 import services from '@/services/demo';
 import { trim } from '@/utils/format';
 import {
@@ -74,13 +75,11 @@ const handleUpdate = async (fields: FormValueType) => {
  *  Deleting a Node
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.Service[]) => {
+const handleRemove = async (selectedRow: API.Service) => {
   const hide = message.loading('Deleting');
-  if (!selectedRows) return true;
+  if (!selectedRow) return true;
   try {
-    selectedRows.forEach(async (row) => {
-      await deleteService({ serviceName: row.name });
-    });
+    await deleteService({ serviceName: selectedRow.name });
     hide();
     message.success('Deleted successfully, will be refreshed soon');
     return true;
@@ -97,13 +96,13 @@ const TableList: React.FC<unknown> = () => {
     useState<boolean>(false);
   const [formValues, setFormValues] = useState<API.PartialService>({});
   const actionRef = useRef<ActionType>();
+  const reload = () => actionRef.current?.reload();
   const [row, setRow] = useState<API.Service>();
   const columns: ProDescriptionsItemProps<API.Service>[] = [
     {
       title: 'Name',
       dataIndex: 'fullName',
-      // @ts-ignore
-      tip: 'Name is an unique key',
+      tooltip: 'Name is an unique key',
       formItemProps: {
         rules: [
           {
@@ -121,7 +120,7 @@ const TableList: React.FC<unknown> = () => {
       dataIndex: 'name',
       valueType: 'text',
       hideInForm: true,
-      hideInTable: true,
+      // hideInTable: true,
       hideInDescriptions: true,
     },
     {
@@ -190,15 +189,14 @@ const TableList: React.FC<unknown> = () => {
             Configure
           </a>
           <Divider type="vertical" />
-          <a
-            onClick={() => {
-              handleRemove([record]);
-              actionRef.current?.reloadAndRest?.();
+          <DeleteButton
+            title={`Delete ${record.fullName} service`}
+            description={`Are you sure you want to delete ${record.fullName}?`}
+            onConfirm={async () => {
+              await handleRemove(record);
+              reload();
             }}
-            style={{ color: 'lightred' }}
-          >
-            Delete
-          </a>
+          />
         </>
       ),
     },
@@ -243,9 +241,7 @@ const TableList: React.FC<unknown> = () => {
             const success = await handleAdd(value);
             if (success) {
               handleModalVisible(false);
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
+              reload();
             }
           }}
           rowKey="id"
@@ -261,9 +257,7 @@ const TableList: React.FC<unknown> = () => {
             if (success) {
               handleUpdateModalVisible(false);
               setFormValues({});
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
+              reload();
             }
           }}
           onCancel={() => {

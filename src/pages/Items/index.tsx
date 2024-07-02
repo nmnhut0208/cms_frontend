@@ -1,3 +1,4 @@
+import DeleteButton from '@/components/DeleteButton';
 import services from '@/services/demo';
 import { queryServiceList } from '@/services/demo/ServiceController';
 import { trim } from '@/utils/format';
@@ -155,7 +156,7 @@ const TableList: React.FC<unknown> = () => {
       dataIndex: 'name',
       valueType: 'text',
       hideInForm: true,
-      hideInTable: true,
+      // hideInTable: true,
       hideInDescriptions: true,
     },
     {
@@ -230,7 +231,7 @@ const TableList: React.FC<unknown> = () => {
               validator(_rule, value, callback) {
                 try {
                   JSON.parse(value);
-                  callback();
+                  callback(undefined);
                 } catch (e) {
                   callback('Invalid JSON');
                 }
@@ -304,14 +305,14 @@ const TableList: React.FC<unknown> = () => {
             Configure
           </a>
           <Divider type="vertical" />
-          <a
-            onClick={() => {
-              handleRemove(service.name || '', [record]);
+          <DeleteButton
+            title={`Delete ${record.fullName} item`}
+            description={`Are you sure to delete ${record.fullName} item of ${service.fullName}?`}
+            onConfirm={async () => {
+              await handleRemove(service.name || '', [record]);
               actionRef.current?.reloadAndRest?.();
             }}
-          >
-            Delete
-          </a>
+          />
         </>
       ),
     },

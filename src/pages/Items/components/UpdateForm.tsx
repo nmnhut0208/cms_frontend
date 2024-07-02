@@ -64,7 +64,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             validator(_rule, value, callback) {
               try {
                 JSON.parse(value);
-                callback();
+                callback(undefined);
               } catch (e) {
                 callback('Invalid JSON');
               }
