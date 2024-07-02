@@ -89,6 +89,7 @@ const GeneratePage: React.FC = () => {
               fieldProps={{
                 name: 'file',
                 // listType: 'picture-card',
+                customRequest: () => {},
               }}
               title="Upload photo"
               onChange={(value) => {

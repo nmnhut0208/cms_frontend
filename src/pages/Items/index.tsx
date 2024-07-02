@@ -136,11 +136,10 @@ const TableList: React.FC<unknown> = () => {
     });
   }, []);
 
-  async function requestItems() {
+  const requestItems = async () => {
     const data = await queryServiceItemList(params.serviceName || '');
     setItems(data || []);
-  }
-
+  };
   useEffect(() => {
     requestItems();
   }, [service]);

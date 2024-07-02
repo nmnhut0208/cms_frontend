@@ -41,13 +41,8 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       initialValues={{ ...props.values }}
       clearOnDestroy
     >
+      <ProFormText hidden name="name" />
       <ProFormText required name="fullName" label="Name" />
-      <ProFormText
-        required
-        name="subcategories"
-        label="Subcategories"
-        placeholder="Enter subcategories separated by commas (e.g. 'Realistic,Chibi')"
-      />
       <ProFormSelect
         required
         name="ai_type"
@@ -56,6 +51,12 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
           'sd-txt2img': 'Text to Image',
           'sd-img2img': 'Image to Image',
         }}
+      />
+      <ProFormText
+        required
+        name="subcategories"
+        label="Subcategories"
+        placeholder="Enter subcategories separated by commas (e.g. 'Realistic,Chibi')"
       />
       <ProFormTextArea name="description" label="Description" />
     </ModalForm>
