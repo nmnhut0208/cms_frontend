@@ -5,3 +5,5 @@ services:
     container_name: frontend
     ports:
       - "80:80"
+    environment:
+      - BACKEND_URI=$BACKEND_URI

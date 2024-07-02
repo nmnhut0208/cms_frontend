@@ -8,6 +8,10 @@ RUN corepack enable
 COPY . /app
 WORKDIR /app
 
+RUN echo ${BACKEND_URI}
+# Set environment variables
+RUN sed 's/process.env.BACKEND_URI/"${BACKEND_URI}"/g' .umirc.ts
+
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
@@ -31,6 +35,7 @@ WORKDIR /usr/share/nginx/html
 
 # Copy static assets from builder stage
 COPY --from=build /app/dist .
+
 
 # Containers run nginx with global directives and daemon off
 ENTRYPOINT ["nginx", "-g", "daemon off;"]

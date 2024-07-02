@@ -92,6 +92,8 @@ const handleRemove = async (selectedRows: API.Service[]) => {
 };
 
 const TableList: React.FC<unknown> = () => {
+  // @ts-ignore
+  console.log('process.env', process.env);
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] =
     useState<boolean>(false);

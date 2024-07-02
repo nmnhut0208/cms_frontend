@@ -7,7 +7,6 @@ import {
   ProDescriptions,
   ProDescriptionsItemProps,
   ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { useParams } from '@umijs/max';
@@ -121,6 +120,7 @@ const handleRemove = async (
 const TableList: React.FC<unknown> = () => {
   const params = useParams<{ serviceName: string }>();
   const [service, setService] = useState<API.PartialService>({});
+  const [items, setItems] = useState<API.ServiceItem[]>([]);
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] =
     useState<boolean>(false);
@@ -130,10 +130,20 @@ const TableList: React.FC<unknown> = () => {
   useEffect(() => {
     queryServiceList().then((services) => {
       setService(
-        services.find((service) => service.name === params.serviceName) || {},
+        services.find((service: any) => service.name === params.serviceName) ||
+          {},
       );
     });
   }, []);
+
+  async function requestItems() {
+    const data = await queryServiceItemList(params.serviceName || '');
+    setItems(data || []);
+  }
+
+  useEffect(() => {
+    requestItems();
+  }, [service]);
 
   const columns: ProDescriptionsItemProps<API.ServiceItem>[] = [
     {
@@ -207,7 +217,7 @@ const TableList: React.FC<unknown> = () => {
     {
       title: 'Payload',
       dataIndex: 'payload',
-      valueType: 'jsonCode',
+      valueType: 'textarea',
       hideInTable: true,
       span: 2,
       // ellipsis: true,
@@ -218,29 +228,26 @@ const TableList: React.FC<unknown> = () => {
           {JSON.stringify(entity.payload, null, 2)}
         </pre>
       ),
-      renderFormItem: () => (
-        <ProFormTextArea
-          fieldProps={{
-            autoSize: { minRows: 6, maxRows: 10 },
-          }}
-          name="payload"
-          required
-          rules={[
-            {
-              validator(_rule, value, callback) {
-                try {
-                  JSON.parse(value);
-                  callback();
-                } catch (e) {
-                  callback('Invalid JSON');
-                }
-              },
+      fieldProps: { autoSize: { minRows: 6, maxRows: 10 } },
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: 'Payload is required',
+          },
+          {
+            validator(_rule, value, callback) {
+              try {
+                JSON.parse(value);
+                callback(undefined);
+              } catch (e) {
+                callback('Invalid JSON');
+              }
             },
-          ]}
-        />
-      ),
+          },
+        ],
+      },
     },
-
     {
       title: 'Properties',
       dataIndex: 'properties',
@@ -339,12 +346,13 @@ const TableList: React.FC<unknown> = () => {
             New
           </Button>,
         ]}
-        request={async () => {
-          const data = await queryServiceItemList(params.serviceName || '');
-          return {
-            data: data || [],
-          };
-        }}
+        dataSource={items}
+        // request={async () => {
+        //   const data = await queryServiceItemList(params.serviceName || '');
+        //   return {
+        //     data: data || [],
+        //   };
+        // }}
         // @ts-ignore
         columns={columns}
       />
@@ -358,9 +366,7 @@ const TableList: React.FC<unknown> = () => {
             const success = await handleAdd(service.name || '', value);
             if (success) {
               handleModalVisible(false);
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
+              await requestItems();
             }
           }}
           rowKey="name"
@@ -376,9 +382,7 @@ const TableList: React.FC<unknown> = () => {
             if (success) {
               handleUpdateModalVisible(false);
               setFormValues({});
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
+              await requestItems();
             }
           }}
           onCancel={() => {
