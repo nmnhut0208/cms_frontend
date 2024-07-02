@@ -10,7 +10,7 @@ export async function getInitialState(): Promise<{ name?: string }> {
 
 export const layout = () => {
   return {
-    logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5BRaHekzQ9yAt7kLyOctXQngSYcBVdZvqFA&s',
+    logo: 'https://seeklogo.com/images/S/stability-ai-icon-logo-B849DEA6FA-seeklogo.com.png',
     menu: {
       locale: false,
     },
