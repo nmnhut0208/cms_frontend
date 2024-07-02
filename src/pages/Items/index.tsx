@@ -1,3 +1,4 @@
+import DeleteButton from '@/components/DeleteButton';
 import services from '@/services/demo';
 import { queryServiceList } from '@/services/demo/ServiceController';
 import { trim } from '@/utils/format';
@@ -51,9 +52,12 @@ const handleAdd = async (
     hide();
     message.success('Added successfully');
     return true;
-  } catch (error) {
+  } catch (error: any) {
     hide();
-    message.error('Add failed, please try again!');
+    let messageText = 'Add failed, please try again!';
+    if (error.response?.status === 409)
+      messageText = 'Item already exists, please change the item name!';
+    message.error(messageText);
     return false;
   }
 };
@@ -94,18 +98,18 @@ const handleUpdate = async (serviceName: string, fields: FormValueType) => {
 
 /**
  *  Deleting a Node
- * @param selectedRows
+ * @param selectedRow
  */
 const handleRemove = async (
   serviceName: string,
-  selectedRows: API.ServiceItem[],
+  selectedRow: API.ServiceItem,
 ) => {
   const hide = message.loading('Deleting');
-  if (!selectedRows) return true;
+  if (!selectedRow) return true;
   try {
     await deleteServiceItem({
       serviceName,
-      serviceItemName: selectedRows.find((row) => row.name)?.name || '',
+      serviceItemName: selectedRow.name || '',
     });
     hide();
     message.success('Deleted successfully, will be refreshed soon');
@@ -120,12 +124,12 @@ const handleRemove = async (
 const TableList: React.FC<unknown> = () => {
   const params = useParams<{ serviceName: string }>();
   const [service, setService] = useState<API.PartialService>({});
-  const [items, setItems] = useState<API.ServiceItem[]>([]);
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] =
     useState<boolean>(false);
   const [formValues, setFormValues] = useState({});
   const actionRef = useRef<ActionType>();
+  const reload = () => actionRef.current?.reload();
   const [row, setRow] = useState<API.ServiceItem>();
   useEffect(() => {
     queryServiceList().then((services) => {
@@ -135,14 +139,6 @@ const TableList: React.FC<unknown> = () => {
       );
     });
   }, []);
-
-  const requestItems = async () => {
-    const data = await queryServiceItemList(params.serviceName || '');
-    setItems(data || []);
-  };
-  useEffect(() => {
-    requestItems();
-  }, [service]);
 
   const columns: ProDescriptionsItemProps<API.ServiceItem>[] = [
     {
@@ -310,14 +306,14 @@ const TableList: React.FC<unknown> = () => {
             Configure
           </a>
           <Divider type="vertical" />
-          <a
-            onClick={() => {
-              handleRemove(service.name || '', [record]);
-              actionRef.current?.reloadAndRest?.();
+          <DeleteButton
+            title={`Delete ${record.fullName} item`}
+            description={`Are you sure you want to delete ${record.fullName} item of service ${service.fullName}?`}
+            onConfirm={async () => {
+              await handleRemove(service.name || '', record);
+              reload();
             }}
-          >
-            Delete
-          </a>
+          />
         </>
       ),
     },
@@ -345,13 +341,12 @@ const TableList: React.FC<unknown> = () => {
             New
           </Button>,
         ]}
-        dataSource={items}
-        // request={async () => {
-        //   const data = await queryServiceItemList(params.serviceName || '');
-        //   return {
-        //     data: data || [],
-        //   };
-        // }}
+        request={async () => {
+          const data = await queryServiceItemList(params.serviceName || '');
+          return {
+            data: data || [],
+          };
+        }}
         // @ts-ignore
         columns={columns}
       />
@@ -365,7 +360,7 @@ const TableList: React.FC<unknown> = () => {
             const success = await handleAdd(service.name || '', value);
             if (success) {
               handleModalVisible(false);
-              await requestItems();
+              reload();
             }
           }}
           rowKey="name"
@@ -381,7 +376,7 @@ const TableList: React.FC<unknown> = () => {
             if (success) {
               handleUpdateModalVisible(false);
               setFormValues({});
-              await requestItems();
+              reload();
             }
           }}
           onCancel={() => {

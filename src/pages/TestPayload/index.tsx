@@ -69,7 +69,7 @@ const TestPayloadPage: React.FC = () => {
   return (
     <PageContainer>
       <ProCard direction="row" split="vertical" gutter={16}>
-        <ProCard title="Input form" colSpan="20%">
+        <ProCard title="Input form" colSpan="25%">
           <ProForm form={form} onFinish={onSubmit}>
             <ProFormSelect
               required

@@ -88,20 +88,18 @@ const GeneratePage: React.FC = () => {
               max={1}
               fieldProps={{
                 name: 'file',
-                // listType: 'picture-card',
-                customRequest: () => {},
-              }}
-              title="Upload photo"
-              onChange={(value) => {
-                if (value.file.percent === 100) {
-                  let reader = new FileReader();
+                customRequest: ({ file, onSuccess }) => {
+                  const reader = new FileReader();
                   reader.onload = (e) => {
                     form.setFieldValue('base64Image', e.target?.result);
+                    if (onSuccess) onSuccess('ok');
                   };
-                  if (!!value.file.originFileObj)
-                    reader.readAsDataURL(value.file.originFileObj);
-                }
+                  reader.readAsDataURL(file as Blob);
+                },
               }}
+              accept="image/png, image/jpeg"
+              action={undefined}
+              title="Upload photo"
             />
             <ProFormSelect
               required

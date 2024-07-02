@@ -33,9 +33,12 @@ const handleAdd = async (fields: API.Service) => {
     hide();
     message.success('Added successfully');
     return true;
-  } catch (error) {
+  } catch (error: any) {
     hide();
-    message.error('Add failed, please try again!');
+    let messageText = 'Add failed, please try again!';
+    if (error.response?.status === 409)
+      messageText = 'Service already exists, please change the service name!';
+    message.error(messageText);
     return false;
   }
 };

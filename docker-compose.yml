@@ -6,4 +6,4 @@ services:
     ports:
       - "80:80"
     environment:
-      - BACKEND_URI=$BACKEND_URI
+      - BACKEND_URI=https://flutter-backend-jhac.onrender.com/backend/cms

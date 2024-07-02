@@ -2,9 +2,7 @@ import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
   define: {
-    BACKEND_URI:
-      process.env.BACKEND_URI ||
-      'https://flutter-backend-jhac.onrender.com/backend/cms',
+    BACKEND_URI: process.env.BACKEND_URI,
   },
   locale: {
     default: 'en-US',
