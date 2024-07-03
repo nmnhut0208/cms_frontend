@@ -56,7 +56,7 @@ const GeneratePage: React.FC = () => {
       category: serviceName as string,
       item_name: itemName as string,
       properties: properties,
-      img: base64Image?.split('data:image/png;base64,')[1] || '',
+      img: base64Image?.split(';base64,')[1] || '',
       upload: upload?.file,
     };
     delete body.upload;
@@ -88,18 +88,23 @@ const GeneratePage: React.FC = () => {
               max={1}
               fieldProps={{
                 name: 'file',
-                customRequest: ({ file, onSuccess }) => {
-                  const reader = new FileReader();
-                  reader.onload = (e) => {
-                    form.setFieldValue('base64Image', e.target?.result);
-                    if (onSuccess) onSuccess('ok');
-                  };
-                  reader.readAsDataURL(file as Blob);
+                customRequest: ({ onSuccess }) => {
+                  if (onSuccess) onSuccess('ok');
                 },
               }}
               accept="image/png, image/jpeg"
               action={undefined}
               title="Upload photo"
+              onChange={(value) => {
+                if (value.file.percent === 100) {
+                  let reader = new FileReader();
+                  reader.onload = (e) => {
+                    form.setFieldValue('base64Image', e.target?.result);
+                  };
+                  if (!!value.file.originFileObj)
+                    reader.readAsDataURL(value.file.originFileObj);
+                }
+              }}
             />
             <ProFormSelect
               required
